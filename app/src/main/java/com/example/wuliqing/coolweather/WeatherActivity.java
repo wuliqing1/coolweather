@@ -1,5 +1,6 @@
 package com.example.wuliqing.coolweather;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.wuliqing.coolweather.gson.Forecast;
 import com.example.wuliqing.coolweather.gson.Weather;
+import com.example.wuliqing.coolweather.service.AutoUpdateService;
 import com.example.wuliqing.coolweather.util.HttpUtil;
 import com.example.wuliqing.coolweather.util.Utility;
 
@@ -129,6 +131,8 @@ public class WeatherActivity extends AppCompatActivity {
                         editor.putString("weather", reponseText);
                         editor.apply();
                         showWeatherInfo(weather);
+                        Intent intent = new Intent(WeatherActivity.this, AutoUpdateService.class);
+                        startService(intent);
                     } else {
                         Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
                     }
