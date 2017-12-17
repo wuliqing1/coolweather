@@ -49,6 +49,7 @@ public class WeatherActivity extends AppCompatActivity {
     public SwipeRefreshLayout swipeRefreshLayout;
     public DrawerLayout drawerLayout;
     private Button navButton;
+    private String currentWeatherId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +64,14 @@ public class WeatherActivity extends AppCompatActivity {
         initView();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = preferences.getString("weather", null);
-        final String weatherId;
         if (weatherString != null) {
             Weather weather = Utility.handleWeatherResponse(weatherString);
-            weatherId = weather.basic.weatherId;
+            currentWeatherId = weather.basic.weatherId;
             showWeatherInfo(weather);
         } else {
-            weatherId = getIntent().getStringExtra("weather_id");
+            currentWeatherId = getIntent().getStringExtra("weather_id");
             weatherLayout.setVisibility(View.INVISIBLE);
-            requestWeather(weatherId);
+            requestWeather(currentWeatherId);
         }
         String bingPic = preferences.getString("bing_pic", null);
         if (bingPic != null) {
@@ -81,7 +81,7 @@ public class WeatherActivity extends AppCompatActivity {
         }
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            requestWeather(weatherId);
+            requestWeather(currentWeatherId);
         });
         navButton.setOnClickListener(view -> {
             drawerLayout.openDrawer(GravityCompat.START);
@@ -110,6 +110,9 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     public void requestWeather(final String weatherId) {
+        if (!currentWeatherId.equals(weatherId)) {
+            currentWeatherId = weatherId;
+        }
         String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=a4b905ec5b6b4444841e81f516554691";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
